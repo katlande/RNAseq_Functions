@@ -1,0 +1,26 @@
+{
+    "id": "8E4CA055",
+    "path": "/gpfs/analyses/kat/Kats_swissRmy_knife/RNAseqFunctions/R/Ol_Reliable.R",
+    "project_path": "R/Ol_Reliable.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1714763771458.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "16,53",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1714763790,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1714763790010,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,27 @@
+{
+    "id": "12298789",
+    "path": "/gpfs/analyses/kat/Kats_swissRmy_knife/RNAseqFunctions/R/checkMetaData.R",
+    "project_path": "R/checkMetaData.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1714753398905.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "19,7",
+        "scrollLine": "7"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1714763645,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1714763645951,
+    "read_only": false,
+    "read_only_alternatives": []
+}

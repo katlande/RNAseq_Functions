@@ -1,0 +1,25 @@
+PlotSetScores <- function(norm, goi, meta, split, cols=NULL, main=NULL){
+
+  tdf <- t(apply(norm, 1, FUN=function(x){as.numeric(scale(x))}))
+  row.names(tdf) <- row.names(norm)
+  colnames(tdf) <- colnames(norm)
+
+  goidf <- data.frame(Sample=colnames(tdf), Score=rowMedians(t(tdf[row.names(tdf)%in%goi,])))
+
+  meta %>% rownames_to_column("Sample") %>%
+    merge(. , goidf, by="Sample", all.x=F, all.y=T) -> score_df
+
+  ggplot2::ggplot(score_df, ggplot2::aes(x=as.factor(meta[[split]]), y=Score, colour=as.factor(meta[[split]])))+
+    ggplot2::geom_boxplot()+
+    ggplot2::geom_jitter(width=0.1, height=0)+
+    Ol_Reliable()+
+    ggplot2::theme(legend.position = "none") -> plot
+
+  if(! is.null(cols)){
+    plot <- plot+ggplot2::scale_colour_manual(values = cols)
+  }
+  if(! is.null(main)){
+    plot <- plot+ggplot2::ggtitle(main)
+  }
+  return(plot)
+}

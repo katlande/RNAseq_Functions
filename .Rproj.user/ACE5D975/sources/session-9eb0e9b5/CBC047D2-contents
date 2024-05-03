@@ -1,0 +1,18 @@
+Ol_Reliable <- function() {
+  theme(
+    panel.border = element_rect(colour = "black", fill = NA),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major.x = element_line(colour = "grey", linewidth = 0.25),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_line(colour = "grey", linewidth = 0.25),
+    panel.grid.minor.y = element_blank(),
+    axis.text = element_text(colour = "black"),
+    axis.title = element_text(colour = "black", face = "italic"),
+    axis.ticks = element_line(colour = "black"),
+    legend.title = element_text(hjust = 0.5),
+    strip.background = element_rect(fill="black"),
+    strip.text = element_text(colour="white", face="bold"),
+    plot.title = element_text(hjust = 0.5, face="bold"),
+    plot.subtitle = element_text(hjust = 0.5),
+    legend.key = element_rect(fill = "white"))
+}

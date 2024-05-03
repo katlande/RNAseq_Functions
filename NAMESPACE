@@ -1,0 +1,11 @@
+exportPattern("^[[:alpha:]]+")
+import(DESeq2)
+import(ggplot2)
+import(ggrepel)
+import(grid)
+import(tibble)
+import(WebGestaltR)
+import(VennDiagram)
+importFrom("stats", "aggregate", "dist", "lm", "loess", "median",
+             "na.omit", "p.adjust", "prcomp", "quantile", "sd", "t.test",
+             "var")
