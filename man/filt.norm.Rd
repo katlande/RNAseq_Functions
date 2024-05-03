@@ -5,7 +5,7 @@
 filt.norm(D, thresh=5, return.tab=T)
 }
 \description{
-Filters and normalizes raw count data with \code{DESeq2::estimateSizeFactors().}
+Filters and normalizes raw count data with \code{DESeq2::estimateSizeFactors()}}
 \arguments{
 \item{D}{A \code{DESeqDataSet} object}
 \item{thresh}{\code{numeric}, minimum counts/gene for gene inclusion}
