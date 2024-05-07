@@ -39,7 +39,14 @@ SetScores <- function (norm, goi, meta, out="data.frame")
       }
     }
     else {
-      goidf <- data.frame(Sample = colnames(tdf), Score = rowMedians(t(tdf[row.names(tdf) %in% goi, ])))
+      
+      if(length(goi) >1){
+        goidf <- data.frame(Sample = colnames(tdf), Score = rowMedians(t(tdf[row.names(tdf) %in% goi, ])))
+      } else {
+        goidf <- data.frame(Sample = colnames(tdf), Score = tdf[row.names(tdf) == goi, ])
+      }
+      
+      
     }
     score_df <- meta %>% rownames_to_column("Sample") %>% merge(., 
                                                                 goidf, by = "Sample", all.x = F, all.y = T)
