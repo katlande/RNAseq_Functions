@@ -24,6 +24,7 @@ cols=c("#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#F4A58
 \item{rowlabs}{\code{boolean}, whether to plot row labels}
 \item{collabs}{\code{boolean}, whether to plot column labels}
 \item{cols}{\code{character}, custom vector of colours to use for cell colours}
+}
 \value{
 Returns a pheatmap object.
 }
