@@ -1,7 +1,7 @@
 Check_Filter <- function(D, thresh=0){
 
   keep <- rowSums(counts(D)) >= thresh #T/F vect for row sum >= thresh
-  print(table(keep)) #how many genes are filtered
+  message(table(keep)) #how many genes are filtered
   D <- D[keep,] #filter D
 
   temp_df <- data.frame(log10(rowSums(counts(D))+1)) #log transform total counts
