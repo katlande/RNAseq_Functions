@@ -1,19 +1,38 @@
-WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB="geneontology_Biological_Process_noRedundant", species="mmusculus", projectName="scratch"){
+WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB="geneontology_Biological_Process_noRedundant", species="mmusculus", projectName=NULL){
 
   if(mode == "ORA"){
-    ORA_down <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
+
+    if(is.null(projectName)){
+      ORA_down <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
+                            enrichDatabaseType = "genesymbol", isOutput=F,
+                            interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange < -1*FC],
+                            interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
+                            referenceGeneType = "genesymbol", topThr = 100,
+                            hostName = "https://www.webgestalt.org")
+      ORA_up <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
+                          enrichDatabaseType = "genesymbol", isOutput=F,
+                          interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange > 1*FC],
+                          interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
+                          referenceGeneType = "genesymbol", topThr = 100,
+                          hostName = "https://www.webgestalt.org")
+    } else {
+      ORA_down <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
                             enrichDatabaseType = "genesymbol", projectName = paste0(projectName, "_ORA_downreg"),
                             interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange < -1*FC],
                             interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
                             referenceGeneType = "genesymbol", topThr = 100,
                             hostName = "https://www.webgestalt.org")
-
-    ORA_up <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
+      ORA_up <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
                           enrichDatabaseType = "genesymbol", projectName = paste0(projectName, "_ORA_upreg"),
                           interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange > 1*FC],
                           interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
                           referenceGeneType = "genesymbol", topThr = 100,
                           hostName = "https://www.webgestalt.org")
+    }
+    
+    
+    
+    
 
     if(nrow(ORA_down) >0 & nrow(ORA_up) >0){
       ORA_down$enrichmentRatio <- ORA_down$enrichmentRatio*-1
@@ -35,13 +54,21 @@ WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB="geneont
 
 
   } else if( mode == "GSEA" ){
-
-    GSEA_output <- WebGestaltR::WebGestaltR(enrichMethod="GSEA",  organism=species,  enrichDatabase = DB,
+     if(is.null(projectName)){
+       GSEA_output <- WebGestaltR::WebGestaltR(enrichMethod="GSEA",  organism=species,  enrichDatabase = DB,
+                               isOutput=F,
+                               interestGene=results[c(7,2)],
+                               interestGeneType="genesymbol",  sigMethod="top",
+                               topThr = 100,  perNum = 1000,   hostName = "https://www.webgestalt.org")
+     } else{
+       GSEA_output <- WebGestaltR::WebGestaltR(enrichMethod="GSEA",  organism=species,  enrichDatabase = DB,
                                projectName = paste0("GSEA_",projectName),
                                interestGene=results[c(7,2)],
                                interestGeneType="genesymbol",  sigMethod="top",
                                topThr = 100,  perNum = 1000,   hostName = "https://www.webgestalt.org")
+     }
 
+    
     if(nrow(GSEA_output) == 0){
       message("No ORA terms are returned!")
     } else {
