@@ -13,7 +13,7 @@ A pipe that runs a simple ORA or GSEA on a makeComp() output file.}
 \item{FC}{absolute log2FC cut-off for DEGs (ORA only)}
 \item{DB}{WebGestalt enrichDatabase to query against, see \code{WebGestaltR::listGeneSet()} for a full list.}
 \item{species}{WebGestalt organism, see \code{WebGestaltR::listOrganism()} for a full list.}
-\item{projectName}{Name of raw data folder.}
+\item{projectName}{Name of raw data folder. If NULL, no folder is made.}
 }
 \value{
 Returns a \code{data.frame} containing enrichment results.
