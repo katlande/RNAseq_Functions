@@ -1,4 +1,4 @@
-homer_to_matrix <- function (raw, cutchar = "_", instance = "1", pool = FALSE, round=TRUE) 
+homer_to_matrix <- function(raw, cutchar = "_", instance = "1", pool = FALSE, round=TRUE) 
 {
   raw <- raw[c(8:ncol(raw))]
   colnames(raw)[c(1)] <- c("Gene")
