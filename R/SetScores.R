@@ -53,7 +53,7 @@ SetScores <- function (norm, goi, meta, out="data.frame")
     if("Sample" %in% colnames(meta)){
       score_df <- merge(meta, goidf, by = "Sample", all.x = F, all.y = T)
     } else{
-      score_df <- meta %>% rownames_to_column("Sample") %>% merge(., 
+      score_df <- meta %>% tibble::rownames_to_column("Sample") %>% merge(., 
                                                                   goidf, by = "Sample", all.x = F, all.y = T)
     }
     return(score_df)
