@@ -9,6 +9,7 @@ SetScores <- function (norm, goi, meta, out="data.frame")
       as.numeric(scale(x))
     }))
     row.names(tdf) <- row.names(norm)
+    as.data.frame(na.omit(tdf))->tdf
     colnames(tdf) <- colnames(norm)
     if (is.list(goi)) {
       for (i in 1:length(goi)) {
