@@ -11,4 +11,4 @@ Depends: R (>= 3.5.0)
 URL: https://github.com/katlande/RNAseq_Functions
 BugReports: https://github.com/katlande/RNAseq_Functions/issues
 biocViews:
-Imports: DESeq2, ggplot2, ggrepel, grid, tibble, WebGestaltR, VennDiagram
+Imports: DESeq2, ggplot2, ggrepel, grid, matrixStats, tibble, WebGestaltR, VennDiagram
