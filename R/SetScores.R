@@ -16,22 +16,22 @@ SetScores <- function (norm, goi, meta, out="data.frame")
           
           if(out == "data.frame"){
             goidf <- data.frame(Sample = colnames(tdf), 
-                                Score = rowMedians(t(tdf[row.names(tdf) %in% 
+                                Score = matrixStats::rowMedians(t(tdf[row.names(tdf) %in% 
                                                            goi[[i]], ])), Set = names(goi)[i])
           } else{
             goidf <- data.frame(Sample = colnames(tdf), 
-                                Set = rowMedians(t(tdf[row.names(tdf) %in% goi[[i]], ])))
+                                Set = matrixStats::rowMedians(t(tdf[row.names(tdf) %in% goi[[i]], ])))
             colnames(goidf)[2] <- names(goi)[i]
           }
         }
         else {
           if(out == "data.frame"){
-            tmp <- data.frame(Sample = colnames(tdf), Score = rowMedians(t(tdf[row.names(tdf) %in% 
+            tmp <- data.frame(Sample = colnames(tdf), Score = matrixStats::rowMedians(t(tdf[row.names(tdf) %in% 
                                                                                  goi[[i]], ])), Set = names(goi)[i])
             goidf <- rbind(goidf, tmp)
           } else{
             tmp <- data.frame(Sample = colnames(tdf), 
-                              Set = rowMedians(t(tdf[row.names(tdf) %in% goi[[i]], ])))
+                              Set = matrixStats::rowMedians(t(tdf[row.names(tdf) %in% goi[[i]], ])))
             colnames(tmp)[2] <- names(goi)[i]
             goidf <- merge(goidf, tmp, by="Sample")
           }
@@ -41,7 +41,7 @@ SetScores <- function (norm, goi, meta, out="data.frame")
     else {
       
       if(length(goi) >1){
-        goidf <- data.frame(Sample = colnames(tdf), Score = rowMedians(t(tdf[row.names(tdf) %in% goi, ])))
+        goidf <- data.frame(Sample = colnames(tdf), Score = matrixStats::rowMedians(t(tdf[row.names(tdf) %in% goi, ])))
       } else {
         goidf <- data.frame(Sample = colnames(tdf), Score = tdf[row.names(tdf) == goi, ])
       }
