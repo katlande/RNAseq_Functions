@@ -6,6 +6,9 @@ import(grid)
 import(tibble)
 import(WebGestaltR)
 import(VennDiagram)
+import(grid)
+import(gridExtra)
+import(gtable)
 importFrom("stats", "aggregate", "dist", "lm", "loess", "median",
              "na.omit", "p.adjust", "prcomp", "quantile", "sd", "t.test",
              "var")
