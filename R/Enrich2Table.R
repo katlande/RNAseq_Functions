@@ -1,9 +1,9 @@
 Enrich2Table <- function(df, mode="ORA", n=10){
   
   if(mode == "ORA"){
-    t <- setNames(ORA[c(1,8,10,6,5)], c("Term", "Enrichment", "FDR", "nGenes", "Total Genes"))
+    t <- setNames(df[c(1,8,10,6,5)], c("Term", "Enrichment", "FDR", "nGenes", "Total Genes"))
   } else{
-    t <- setNames(GSEA[c(1,6,8,11,9)], c("Term", "Enrichment", "FDR", "nGenes", "Total Genes"))
+    t <- setNames(df[c(1,6,8,11,9)], c("Term", "Enrichment", "FDR", "nGenes", "Total Genes"))
   }
   t$Enrichment <- formatC(t$Enrichment, digits = 2)
   t$FDR <- formatC(t$FDR, digits = 2, format = "E")
