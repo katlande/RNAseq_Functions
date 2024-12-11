@@ -1,4 +1,8 @@
-WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB="geneontology_Biological_Process_noRedundant", species="mmusculus", projectName=NULL){
+WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB=NULL, species="mmusculus", projectName=NULL){
+
+if(is.null(DB)){
+  DB <- ifelse(mode == "ORA", "geneontology_Biological_Process_noRedundant", "pathway_KEGG)
+}
 
   if(mode == "ORA"){
 
