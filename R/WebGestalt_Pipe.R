@@ -1,4 +1,4 @@
-WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB=NULL, species="mmusculus", projectName=NULL){
+WebGestalt_Pipe <- function(mode="ORA", results, alpha=0.05, FC=0.5, DB=NULL, species="mmusculus", projectName=NULL, outputTerms=100){
 
 if(is.null(DB)){
   DB <- ifelse(mode == "ORA", "geneontology_Biological_Process_noRedundant", "pathway_KEGG)
@@ -11,26 +11,26 @@ if(is.null(DB)){
                             enrichDatabaseType = "genesymbol", isOutput=F,
                             interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange < -1*FC],
                             interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
-                            referenceGeneType = "genesymbol", topThr = 100,
+                            referenceGeneType = "genesymbol", topThr = outputTerms,
                             hostName = "https://www.webgestalt.org")
       ORA_up <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
                           enrichDatabaseType = "genesymbol", isOutput=F,
                           interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange > 1*FC],
                           interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
-                          referenceGeneType = "genesymbol", topThr = 100,
+                          referenceGeneType = "genesymbol", topThr = outputTerms,
                           hostName = "https://www.webgestalt.org")
     } else {
       ORA_down <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
                             enrichDatabaseType = "genesymbol", projectName = paste0(projectName, "_ORA_downreg"),
                             interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange < -1*FC],
                             interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
-                            referenceGeneType = "genesymbol", topThr = 100,
+                            referenceGeneType = "genesymbol", topThr = outputTerms,
                             hostName = "https://www.webgestalt.org")
       ORA_up <- WebGestaltR::WebGestaltR(enrichMethod="ORA", organism=species, enrichDatabase = DB,
                           enrichDatabaseType = "genesymbol", projectName = paste0(projectName, "_ORA_upreg"),
                           interestGene=results$Gene[results$padj <= alpha & results$log2FoldChange > 1*FC],
                           interestGeneType="genesymbol", sigMethod="top", referenceGene = results$Gene,
-                          referenceGeneType = "genesymbol", topThr = 100,
+                          referenceGeneType = "genesymbol", topThr = outputTerms,
                           hostName = "https://www.webgestalt.org")
     }
     
@@ -63,13 +63,13 @@ if(is.null(DB)){
                                isOutput=F,
                                interestGene=results[c(7,2)],
                                interestGeneType="genesymbol",  sigMethod="top",
-                               topThr = 100,  perNum = 1000,   hostName = "https://www.webgestalt.org")
+                               topThr = outputTerms,  perNum = 1000,   hostName = "https://www.webgestalt.org")
      } else{
        GSEA_output <- WebGestaltR::WebGestaltR(enrichMethod="GSEA",  organism=species,  enrichDatabase = DB,
                                projectName = paste0("GSEA_",projectName),
                                interestGene=results[c(7,2)],
                                interestGeneType="genesymbol",  sigMethod="top",
-                               topThr = 100,  perNum = 1000,   hostName = "https://www.webgestalt.org")
+                               topThr = outputTerms,  perNum = 1000,   hostName = "https://www.webgestalt.org")
      }
 
     
