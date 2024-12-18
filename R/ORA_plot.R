@@ -1,4 +1,4 @@
-ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process"){
+ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process", logSize=F){
   
   if(balance == T){
     tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:ceiling(n/2),],
@@ -8,7 +8,7 @@ ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process"){
   }
   
   tmp$ID <- factor(tmp$ID, tmp$ID[order(tmp$enrichmentRatio)])
-  tmp$plot_FDR <- -log10(tmp$FDR+min(tmp$FDR[!tmp$FDR==0]*0.5))
+  tmp$plot_FDR <- -log10(tmp$FDR+min(ORA$FDR[!ORA$FDR==0]*0.5))
   max_fdr <- ceiling(max(tmp$plot_FDR))
   tmp$sig <- factor(tmp$FDR <= 0.05, levels=c("TRUE", "FALSE"))
   
@@ -22,16 +22,28 @@ ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process"){
   }
   
   ggplot(tmp, aes(y=ID, x=enrichmentRatio, 
-                  size=plot_FDR, 
+                  size=size, 
                   fill=sign(enrichmentRatio)*plot_FDR))+
     geom_point(aes(shape=sig))+
-    scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), drop=F)+
     scale_fill_gradientn("pAdj", colours = rev(RColorBrewer::brewer.pal(9, "RdBu")), breaks=breaks, labels=labels, limits=c(-max_fdr, max_fdr))+
-    scale_size_continuous(guide = "none")+
     xlab("Enrichment Ratio")+
     ylab("")+
     Ol_Reliable()+
     labs(title="Top ORA Hits", subtitle=ontology_name) -> plot
+  
+  if(any(tmp$FDR > 0.05)){
+    plot <- plot +  scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), drop=F)
+  } else {
+    plot <- plot +  scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), guide="none")
+  }
+  
+  
+  if(logSize){
+    plot <- plot+ scale_size_continuous("nGenes", range = c(0.1, 5), trans = "log10")
+  } else{
+    plot <- plot+ scale_size_continuous("nGenes", range = c(0.1, 5))
+  }
+  
   return(plot)
   
 }
