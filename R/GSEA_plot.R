@@ -1,4 +1,4 @@
-GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG"){
+GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG", logSize=F){
   
   if(balance == T){
     tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:ceiling(n/2),],
@@ -8,7 +8,7 @@ GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG"){
   }
   
   tmp$ID <- factor(tmp$ID, tmp$ID[order(tmp$normalizedEnrichmentScore)])
-  tmp$plot_FDR <- -log10(tmp$FDR+min(tmp$FDR[!tmp$FDR==0]*0.5))
+  tmp$plot_FDR <- -log10(tmp$FDR+min(GSEA$FDR[!GSEA$FDR==0]*0.5))
   max_fdr <- ceiling(max(tmp$plot_FDR))
   tmp$sig <- factor(tmp$FDR <= 0.05, levels=c("TRUE", "FALSE"))
   
@@ -22,16 +22,29 @@ GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG"){
   }
   
   ggplot(tmp, aes(y=ID, x=normalizedEnrichmentScore, 
-                  size=plot_FDR, 
+                  size=leadingEdgeNum, 
                   fill=sign(normalizedEnrichmentScore)*plot_FDR))+
     geom_point(aes(shape=sig))+
-    scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), drop=F)+
+    #scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), drop=F)+
     scale_fill_gradientn("pAdj", colours = rev(RColorBrewer::brewer.pal(9, "RdBu")), breaks=breaks, labels=labels, limits=c(-max_fdr, max_fdr))+
-    scale_size_continuous(guide = "none")+
+    #scale_size_continuous(guide = "none")+
     xlab("Normalized Enrichment Score")+
     ylab("")+
     Ol_Reliable()+
     labs(title="Top GSEA Hits", subtitle=ontology_name) -> plot
+  
+  if(any(tmp$FDR > 0.05)){
+    plot <- plot +  scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), drop=F)
+  } else {
+    plot <- plot +  scale_shape_manual("Significant", values = c(`FALSE`=13,`TRUE`=21), guide="none")
+  }
+  
+  if(logSize){
+    plot <- plot+ scale_size_continuous("nGenes", range = c(0.1, 5), trans = "log10")
+  } else{
+    plot <- plot+ scale_size_continuous("nGenes", range = c(0.1, 5))
+  }
+  
   
   return(plot)
 }
