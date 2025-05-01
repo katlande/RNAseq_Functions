@@ -1,8 +1,38 @@
 ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process", logSize=F){
   
   if(balance == T){
-    tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:ceiling(n/2),],
-                 ORA[ORA$enrichmentRatio < 0,][1:ceiling(n/2),])
+   if(any(ORA$FDR[ORA$enrichmentRatio > 0][1:ceiling(n/2)] > 0.05) == T & any(ORA$FDR[ORA$enrichmentRatio < 0][1:ceiling(n/2)] > 0.05) == F){
+      
+      downlen <- length(which(ORA$FDR[ORA$enrichmentRatio < 0][1:ceiling(n)] < 0.05))
+      uplen <- length(which(ORA$FDR[ORA$enrichmentRatio > 0][1:ceiling(n)] < 0.05))
+      
+      if(uplen+downlen > n){
+        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:uplen,],
+                     ORA[ORA$enrichmentRatio < 0,][1:(n-uplen),])
+      } else {
+        dif <- ceiling((n-(uplen+downlen))/2)
+        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:(uplen+dif),],
+                     ORA[ORA$enrichmentRatio < 0,][1:(downlen+dif),])
+      }
+
+      
+    } else if(any(ORA$FDR[ORA$enrichmentRatio > 0][1:ceiling(n/2)] > 0.05) == F & any(ORA$FDR[ORA$enrichmentRatio < 0][1:ceiling(n/2)] > 0.05) == T){
+      downlen <- length(which(ORA$FDR[ORA$enrichmentRatio < 0][1:ceiling(n)] < 0.05))
+      uplen <- length(which(ORA$FDR[ORA$enrichmentRatio > 0][1:ceiling(n)] < 0.05))
+      
+      if(uplen+downlen > n){
+        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:n-downlen,],
+                     ORA[ORA$enrichmentRatio < 0,][1:downlen,])
+      } else {
+        dif <- ceiling((n-(uplen+downlen))/2)
+        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:(uplen+dif),],
+                     ORA[ORA$enrichmentRatio < 0,][1:(downlen+dif),])
+      }
+    } else {
+      tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:ceiling(n/2),],
+                   ORA[ORA$enrichmentRatio < 0,][1:ceiling(n/2),])
+    }
+    
   } else {
     tmp <- ORA[1:n,]
   }
