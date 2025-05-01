@@ -1,8 +1,38 @@
 GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG", logSize=F){
   
   if(balance == T){
-    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:ceiling(n/2),],
-                 GSEA[GSEA$normalizedEnrichmentScore < 0,][1:ceiling(n/2),])
+    if(any(GSEA$FDR[GSEA$normalizedEnrichmentScore > 0][1:ceiling(n/2)] > 0.05) == T & any(GSEA$FDR[GSEA$normalizedEnrichmentScore < 0][1:ceiling(n/2)] > 0.05) == F){
+  
+  downlen <- length(which(GSEA$FDR[GSEA$normalizedEnrichmentScore < 0][1:ceiling(n)] < 0.05))
+  uplen <- length(which(GSEA$FDR[GSEA$normalizedEnrichmentScore > 0][1:ceiling(n)] < 0.05))
+  
+  if(uplen+downlen > n){
+    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:uplen,],
+                 GSEA[GSEA$normalizedEnrichmentScore < 0,][1:(n-uplen),])
+  } else {
+    dif <- ceiling((n-(uplen+downlen))/2)
+    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:(uplen+dif),],
+                 GSEA[GSEA$normalizedEnrichmentScore < 0,][1:(downlen+dif),])
+  }
+  
+  
+} else if(any(GSEA$FDR[GSEA$normalizedEnrichmentScore > 0][1:ceiling(n/2)] > 0.05) == F & any(GSEA$FDR[GSEA$normalizedEnrichmentScore < 0][1:ceiling(n/2)] > 0.05) == T){
+  downlen <- length(which(GSEA$FDR[GSEA$normalizedEnrichmentScore < 0][1:ceiling(n)] < 0.05))
+  uplen <- length(which(GSEA$FDR[GSEA$normalizedEnrichmentScore > 0][1:ceiling(n)] < 0.05))
+  
+  if(uplen+downlen > n){
+    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:n-downlen,],
+                 GSEA[GSEA$normalizedEnrichmentScore < 0,][1:downlen,])
+  } else {
+    dif <- ceiling((n-(uplen+downlen))/2)
+    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:(uplen+dif),],
+                 GSEA[GSEA$normalizedEnrichmentScore < 0,][1:(downlen+dif),])
+  }
+} else {
+  tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:ceiling(n/2),],
+               GSEA[GSEA$normalizedEnrichmentScore < 0,][1:ceiling(n/2),])
+}
+
   } else {
     tmp <- GSEA[1:n,]
   }
