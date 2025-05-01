@@ -21,7 +21,7 @@ ORA_plot <- function(ORA, balance=T, n=10, ontology_name="Biological Process", l
       uplen <- length(which(ORA$FDR[ORA$enrichmentRatio > 0][1:ceiling(n)] < 0.05))
       
       if(uplen+downlen > n){
-        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:n-downlen,],
+        tmp <- rbind(ORA[ORA$enrichmentRatio > 0,][1:(n-downlen),],
                      ORA[ORA$enrichmentRatio < 0,][1:downlen,])
       } else {
         dif <- ceiling((n-(uplen+downlen))/2)
