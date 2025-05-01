@@ -21,7 +21,7 @@ GSEA_plot <- function(GSEA, balance=T, n=10, ontology_name="KEGG", logSize=F){
   uplen <- length(which(GSEA$FDR[GSEA$normalizedEnrichmentScore > 0][1:ceiling(n)] < 0.05))
   
   if(uplen+downlen > n){
-    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:n-downlen,],
+    tmp <- rbind(GSEA[GSEA$normalizedEnrichmentScore > 0,][1:(n-downlen),],
                  GSEA[GSEA$normalizedEnrichmentScore < 0,][1:downlen,])
   } else {
     dif <- ceiling((n-(uplen+downlen))/2)
