@@ -5,4 +5,3 @@
 
 #### A guided tutorial for use is available:
 * [online](https://github.com/katlande/RNAseq_Functions/blob/main/RNAseq_Tutorial.md)
-* [as a downloadable PDF](https://github.com/katlande/RNAseq_Functions/blob/main/RNAseq_Tutorial.pdf)
