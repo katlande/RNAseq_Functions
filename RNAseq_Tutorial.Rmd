@@ -2,7 +2,12 @@
 title: "Basic RNAseq Pipeline"
 author: "Kathryn Lande"
 date: "2024-05-22"
-output: rmarkdown::html_vignette
+output: 
+  #rmarkdown::html_vignette:
+  rmarkdown::github_document:
+    number_sections: true
+    toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{Basic RNAseq Pipeline}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,7 +23,7 @@ knitr::opts_chunk$set(
 ```
 
 
-## Load packages and data
+# Load Packages and Data
 
 ```{r, message=FALSE, warning=FALSE}
 # install packages if necessary:
@@ -43,21 +48,25 @@ data(test_counts)
 data(test_design)
 ```
 
+
 RNAseq experiments require two files. The first is a gene-by-sample matrix of raw count data, that looks something like this:
 
 ```{r}
 head(test_counts)
 ```
+
+
 The row names are gene or transcript IDs, and the column names are sample names. The included function homer_to_matrix() will convert the output of Homer's analyzeRepeats.pl into this format. The second file is the meta data, which would look something like this:
 
 ```{r}
 head(test_design)
 ```
 
+
 The row names are sample names that match the column names of the counts file, and the column names represent sample information. In thise case, we have information about the treatment and age of our test samples. 
 
 
-## Set up data for analysis
+# Prepare Data for Analysis
 Let's make sure samples in our meta data have the same names and occur in the same order as our count data. Samples with mismatched names or those that occur in different orders may cause downstream errors.
 
 ```{r}
@@ -65,6 +74,9 @@ test_design <- checkMetaData(test_design, test_counts)
 # Our files match, so no modification was made.
 # Dis-ordered data will be reordered, and mis-matched names will throw a warning.
 ```
+
+
+## DESeq2 Experimental Designs
 
 For differential expression analysis with DEseq2, we'll need to combine our count and meta data into a DESeqDataSet object. How we design this object depends on the comparisons we want to make. In the 'design' parameter, we add variables (columns of the meta data) that we want to factor into our analysis. If we want to look at a single variable and controlling for the other (for example, looking at the difference between all young and all old samples, controlling for the effect of the treatment), we would set up an object like this: 
 
@@ -74,6 +86,7 @@ D1 <- DESeqDataSetFromMatrix(countData = test_counts,
                              design = as.formula(~age+treatment))
 ```
 
+
 However, if you wanted to make more specific comparisons, e.g., young ctl vs. old ctl, you would set up your object like this:
 
 ```{r, message=FALSE}
@@ -81,6 +94,7 @@ D2 <- DESeqDataSetFromMatrix(countData = test_counts,
                              colData = test_design,
                              design = as.formula(~group))
 ```
+
 
 Basically, you will be able to make a comparison of any two levels in any meta data column included in the design, and other columns in the design will be controlled for. The design formula can be made more complex to account for additive and non-additive variables, fixed and random variables, and crossed and nested designs. The design for D1 assumes age and treatment are additive variables in a crossed design. See some examples of other formulas you could set up:
 
@@ -92,20 +106,23 @@ design = as.formula(~(1|factorA/factorB)) # when factorB is nested and crossed w
 ```
 
 
+## Gene Filtering
+
 Finally, we will need to identify a minimum read cut-off to remove lowly and non-expressed genes. A large chunk of the transcriptome will not be expressed in any given sample, and these genes will create noise if not removed. We can identify a good filtering threshold using the Check_Filter() function:
 
-```{r, message=FALSE}
+```{r, message=FALSE, fig.width=5, fig.height=4, fig.align='center'}
 Check_Filter(D1) # this is a density plot of total reads per gene 
 Check_Filter(D1, 10) # this is the same density plot, but genes with less than 10 total reads are removed.
 ```
 
+
 Using a cut-off of 10 sufficiently removes the non-expressed genes.
 
 
-## Quality Control
+# Quality Control
 The last step before differential expression analysis is quality control to make sure the data is usable.
 
-### Read depth
+## Read depth
 If too few reads are sequenced in any of our samples, they won't give us reliable information. In general, a minimum read depth of ~10 million is a good threshold for mouse and human. This number will be larger or smaller for larger and smaller transcriptomes, respectively.
 
 ```{r, fig.width=3, fig.height=4, fig.align='center'}
@@ -113,27 +130,31 @@ CheckDepth(test_counts, minDepth = 1e07)
 # All samples have appropriate read depth above our minimum threshold.
 ```
 
-### Sample clustering
+
+## Sample Clustering
 We expect samples to group together based on meta data variables. We can confirm this with a PCA.
-```{r, fig.width=6, fig.height=4, fig.align='center'}
+
+```{r, fig.width=5, fig.height=4, fig.align='center'}
 customPCA(D1, # DESeqDataSet
           test_design, # meta data
           ptcol = "group", # colour the points based on this column of test_design
           filter_threshold = 10) # the threshold we determined previously
 ```
 
+
 Here we can see that a massive portion of the transcriptional variance is explained by age (~85%). There is also separation between treatment and control samples within age groups, but it's a little noisier. We can expect that there will be a lot more differentially expressed genes between young and old than there will be between treatment and control.
 
 PCAs can also be used to identity outliers (single samples that cluster strangely), and potential sample swaps (e.g., one young sample that clusters with old samples and one old sample that clusters with young samples on the same PCA *might* indicate that the sample IDs of these two samples were swapped).
 
 
-## Differential Expression
+# Differential Expression
 There are many tools for calcualting differential expression, but in this tutorial we'll be using DESeq2. The following function will filter, normalize, and run DESeq2 on a DESeqDataSet object:
 
 ```{r, message=FALSE}
 Dnorm1 <- DESeq_and_Filt(D1, filter_thresh = 10,  minSamples = 2) # minimum of 2 of samples with > 0 reads required for gene inclusion
 Dnorm2 <- DESeq_and_Filt(D2, filter_thresh = 10, minSamples = 2) 
 ```
+
 
 These Dnorm objects contain differential expression information for all possible comparisons based on the design of the input object. Dnorm1 contains a comparison of ages controlling for treatment, and a comparison of treatments controlling for ages. Dnorm2 contains all pairwise comparisons of the 'group' column in the metadata: 'young trt' vs. 'old trt', 'young trt' vs. 'young ctl', etc. We can extract these differential expression statistics into a data.frame using the makeComp() function:
 
@@ -149,6 +170,7 @@ young_old_trt <- makeComp(Dnorm2, "group", "old trt", "young trt")
 head(young_old_all)
 ```
 
+
 The two most important values for differential expression are log2FoldChange, the magnitude of change, and pAdj, the adjusted p-value of differential expression. Typically, differentially expressed genes (DEGs) are defined as pAdj<=0.05 and absolute(log2FC) > 0.5 or > 1. Let's see how many DEGs we get from each of these comparisons:
 
 ```{r}
@@ -158,11 +180,18 @@ getDEGs(young_old_ctl, lfc = 1)
 getDEGs(young_old_trt, lfc = 1)
 ```
 
+
+## Volcano Plots
+
 As we predicted from the PCA, we see many more DEGs with age than we do with treatment. We can also look at DEGs using volcano plots:
+
 ```{r, fig.width=6, fig.height=4, fig.align='center'}
 eRupt(young_old_all, FCsig = 1)+ggtitle("Young vs. Old")
 eRupt(ctl_trt_all, FCsig = 1)+ggtitle("CTL vs. TRT")
 ```
+
+
+## Heatmaps
 
 We may want to visualize our differentially expressed genes with a heatmap:
 ```{r, fig.width=6, fig.height=7, fig.align='center'}
@@ -182,6 +211,7 @@ Reliable_heatmap(normalized_counts, # values to plot
 ```
 
 If we want to check how much overlap we see between DEGs from multiple comparisons, we can make a venn diagram:
+
 ```{r, fig.width=4, fig.height=4, fig.align='center'}
 
 old_ctl <- getDEGs(young_old_ctl, lfc = 1, direction = "up", mode = "vector") # a vector all age-upregulated genes in the control samples
@@ -191,11 +221,15 @@ display_venn(list(old_ctl, old_trt), # a list of gene names to overlap
              category.names = c("CTL", "TRT")) # names of the gene sets
 ```
 
+
 Many of the genes upregulated with age are common to both control and treatment samples, but these samples also seem to have unique aging signatures as well.
 
 
-## Functions of Differentially Expressed Genes
+# Functions of Differentially Expressed Genes
 Now that we know which genes change under different conditions, we can check to see what functions/pathways they belong to. *For the rest of the tutorial, we'll focus only on the young_old_all data.* 
+
+
+## GO Enrichment and Pathway Analysis
 
 ```{r, warning=FALSE, message=FALSE, error=FALSE, results=FALSE}
 ORA <- WebGestalt_Pipe("ORA", # type of enrichment; either 'ORA' or 'GSEA'
@@ -207,13 +241,26 @@ ORA <- WebGestalt_Pipe("ORA", # type of enrichment; either 'ORA' or 'GSEA'
 ```
 
 The ORA results tell us which biological processes contain more DEGs than we expect by random chance, here's a bit of what these results look like:
+
 ```{r}
 head(ORA[c(3,8,10)])
 ```
+
 Here we see a significant increase in muscle tissue development and molting cycle genes with age (positive enrichment), and a significant decrease in nucleoside mono- and tri-phosphate metabolic process genes with age (negative enrichment).
 
 
-### Looking at gene sets of interest
+We can also look at our top ORA results with a dot plot:
+```{r, fig.width=7, fig.height=5, fig.align='center'}
+ORA_plot(ORA, 
+         balance = T, # TRUE/FALSE whether to include and equal number of up and down terms
+         ontology_name = "Biological Processes", # subtitle
+         n =14) # number of terms to plot
+```
+
+The same can also be done for GSEAs using the "GSEA" setting WebGestalt_Pipe(), and the GSEA_plot() function.
+
+
+## Gene Set Scores
 You may be interested in the behaviour of a specific set of genes. In this example, we'll look at the following set of genes that's related to oxidative phosphorylation:
 
 ```{r}
@@ -222,6 +269,7 @@ OxPhos <- c("Ndufb10", "Ndufa10", "Ndufb9", "Atp5e", "Uqcrq", "Atp5o", "Ndufv3",
             "Cox5a", "Cox5b", "Cox7c", "Cox7b", "Cox17", "Atp6v1b2", "Atp5k", 
             "Ndufs4", "Atp5h", "Cox7a1", "Lhpp", "Ndufs3", "Ndufa1", "Cox6a1")
 ```
+
 
 First, we can check if these genes are enriched in either the up- or down-regulated DEGs. The function SetEnrichment() prints two values. The first is the p-value of enrichment (Fisher's Exact Test), the second is the enrichment ratio. If the enrichment ratio is above 1, the genes are enriched in the DEGs. If they are below 1, they are depleted from the DEGs.
 
@@ -242,6 +290,7 @@ SetEnrichment(OxPhos, # Genes of interest
 # this means OxPhos genes are extremely significantly enriched in the downregulated genes!
 ```
 
+
 We can also calculate set expression scores for each of our samples. These values reflect the average relative expression of all genes in a set, and as such take *normalized counts* as an input (do not use raw counts or FPKMs). 
 
 ```{r, fig.width=5, fig.height=6, fig.align='center'}
@@ -254,6 +303,7 @@ ggplot(OxPhos_Scores, aes(x=group, y=Score, fill=group))+
   geom_jitter(height = 0, width=0.075)+ # one point for each sample
   Ol_Reliable() # custom plot theme
 ```
+
 
 Here we see that age has a strong influence on oxphos gene expression, while treatment does not. An important caveat about these plots is that the score value is relative, and will change if different samples are used for the input. *You cannot compare scores that are generated in two separate commands.* 
 
