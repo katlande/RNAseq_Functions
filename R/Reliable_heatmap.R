@@ -15,6 +15,9 @@ Reliable_heatmap <- function(norm, genes=NULL, sample_meta=NULL, annotation=F, a
   if(! is.null(sample_meta)){
     sample_meta <- sample_meta[row.names(sample_meta) %in% colnames(n),]
     n <- n[colnames(n) %in% row.names(sample_meta)]
+    if(ncol(sample_meta) == 1){
+       sample_meta$`Specify_annots_argument_to_remove_me` <- 1
+    }  
   }
   
   if(annotation==T){
