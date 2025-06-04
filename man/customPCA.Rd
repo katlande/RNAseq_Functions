@@ -4,7 +4,7 @@
 \usage{
 customPCA(D, meta, ptcol, filter_threshold=5,  ptsize=2,
          labsize=3, ptshape=NA, main="PCA", label=F, facet=NA,
-         frows=NA, fcols=NA, fscale="fixed", custom_cols=NULL)
+         frows=NA, fcols=NA, fscale="fixed", custom_cols=NULL, stabilize_variance=F)
 }
 \description{
 Checks if meta data and count data match; reorders meta data when necessary, and warns users if files do not match.}
@@ -23,6 +23,7 @@ Checks if meta data and count data match; reorders meta data when necessary, and
 \item{fcols}{if \code{facet} is not \code{NA}, number of facet columns}
 \item{fscale}{if \code{facet} is not \code{NA}, facet scales: "fixed", "free", "free_x", "free_y"}
 \item{custom_cols}{\code{vector} of colours for point colours}
+\item{stabilize_variance}{\code{boolean}, whether or not to apply varianceStabilizingTransformation() prior to plotting}
 }
 \value{
 Returns PCA plot of data.
